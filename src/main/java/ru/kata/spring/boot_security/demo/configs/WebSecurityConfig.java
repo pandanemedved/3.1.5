@@ -1,5 +1,6 @@
 package ru.kata.spring.boot_security.demo.configs;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -9,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFilter;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
 import ru.kata.spring.boot_security.demo.service.UserDetailsServiceImpl;
 
 @Configuration
@@ -42,6 +45,13 @@ WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .permitAll();
+    }
+
+    @Bean
+    public FilterRegistrationBean<HiddenHttpMethodFilter> authenticationFilterBean() {
+        FilterRegistrationBean<HiddenHttpMethodFilter> registrationBean = new FilterRegistrationBean<>(new HiddenHttpMethodFilter());
+        registrationBean.setOrder(1);
+        return registrationBean;
     }
 
     @Bean

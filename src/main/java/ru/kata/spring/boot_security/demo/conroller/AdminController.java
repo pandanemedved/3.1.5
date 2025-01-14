@@ -44,13 +44,13 @@ public class AdminController {
         return "redirect:/admin";
     }
 
-    @GetMapping("/delete")
+    @DeleteMapping("/delete")
     public String deleteUser(@RequestParam("id") Long id) {
         userService.deleteUser(id);
         return "redirect:/admin";
     }
 
-    @PostMapping("/edit")
+    @PatchMapping("/edit")
     public String editUser(@ModelAttribute("user") User user) {
         userService.updateUser(user.getId(), user);
         return "redirect:/admin";
