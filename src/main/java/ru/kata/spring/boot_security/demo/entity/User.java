@@ -43,9 +43,12 @@ public class User implements UserDetails {
 
     public User() {}
 
-    public User(String username, String email) {
+    public User(String username, String email, String FirstName, String LastName, Integer userage) {
         this.username = username;
         this.email = email;
+        this.firstName = FirstName;
+        this.lastName = LastName;
+        this.userage = userage;
     }
 
     public void setRoles(Set<Role> roles) {

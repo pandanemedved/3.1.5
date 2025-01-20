@@ -1,5 +1,7 @@
 package ru.kata.spring.boot_security.demo.conroller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -7,6 +9,8 @@ import ru.kata.spring.boot_security.demo.entity.Role;
 import ru.kata.spring.boot_security.demo.entity.User;
 import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 import ru.kata.spring.boot_security.demo.service.UserService;
+import ru.kata.spring.boot_security.demo.util.UserErrorResponse;
+import ru.kata.spring.boot_security.demo.util.UserNotFoundException;
 
 import java.util.HashSet;
 import java.util.List;
