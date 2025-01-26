@@ -86,8 +86,8 @@
                     <div class="mb-3">
                         <label for="roles" class="form-label">Roles</label>
                         <select id="roles" class="form-select" multiple required>
-                            <option value="ROLE_ADMIN">ROLE_ADMIN</option>
-                            <option value="ROLE_USER">ROLE_USER</option>
+                            <option value="1" data-id="1">ADMIN</option>
+                            <option value="2" data-id="2">USER</option>
                         </select>
                     </div>
                 </div>
@@ -202,8 +202,11 @@
                 firstname: document.getElementById('firstname').value,
                 lastname: document.getElementById('lastname').value,
                 email: document.getElementById('email').value,
-                userage: document.getElementById('userage').value,
-                roles: Array.from(document.getElementById('roles').selectedOptions).map(opt => opt.value)
+                userage: Number(document.getElementById('userage').value),
+                roles: Array.from(document.getElementById('roles').selectedOptions).map(opt => ({
+                    id: parseInt(opt.value, 10),
+                    roleName: opt.textContent
+                }))
             };
 
             fetch('api/admin/add', {
@@ -218,7 +221,7 @@
                     loadUsers();
                     const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
                     modal.hide();
-                    document.getElementById('addUserForm').reset();
+                    alert("Пользователь успешно добавлен !")
                 });
         });
 
@@ -227,13 +230,17 @@
             fetch(`/api/admin/edit/${id}`)
                 .then(response => response.json())
                 .then(user => {
+                    const editRoleSelected = document.getElementById('edit-roles');
+                    Array.from(editRoleSelected.options).forEach(option => {
+                        option.selected = user.roles.some(role => role.id === option.value);
+                    })
                     document.getElementById('edit-id').value = user.id;
                     document.getElementById('edit-username').value = user.username;
                     document.getElementById('edit-firstname').value = user.firstname;
                     document.getElementById('edit-lastname').value = user.lastname;
                     document.getElementById('edit-userage').value = user.userage;
                     document.getElementById('edit-email').value = user.email;
-                    document.getElementById('edit-roles').value = user.roles.map(role => role.roleName);
+                    document.getElementById('edit-roles').value = editRoleSelected;
                     new bootstrap.Modal(document.getElementById('editUserModal')).show();
                 })
                 .catch(error => {
@@ -251,11 +258,12 @@
                 username: document.getElementById('edit-username').value,
                 firstname: document.getElementById('edit-firstname').value,
                 lastname: document.getElementById('edit-lastname').value,
-                userage: document.getElementById('edit-userage').value,
+                userage: Number(document.getElementById('edit-userage').value),
                 email: document.getElementById('edit-email').value,
-                roles: Array.from(document.getElementById('edit-roles').selectedOptions).map(option => {
-                    return {id: option.value, roleName: option.textContent};
-                })
+                roles: Array.from(document.getElementById('edit-roles').selectedOptions).map(option => ({
+                    id: parseInt(option.value, 10),
+                    roleName: option.textContent
+                }))
             };
 
             fetch(`api/admin/edit/${userData.id}`, {

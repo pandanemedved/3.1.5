@@ -2,17 +2,42 @@ package ru.kata.spring.boot_security.demo.DTO;
 
 import org.springframework.stereotype.Component;
 import ru.kata.spring.boot_security.demo.entity.Role;
+import ru.kata.spring.boot_security.demo.entity.User;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class UserDTO {
+    private Long id;
     private String username;
     private String password;
     private String firstname;
     private String lastname;
     private String email;
     private int userage;
-    private List<String> roles;
+    private Set<Role> roles;
+
+    public UserDTO() {}
+
+    public UserDTO(User user) {
+        this.id = user.getId();
+        this.username = user.getUsername();
+        this.firstname = user.getFirstname();
+        this.lastname = user.getLastname();
+        this.email = user.getEmail();
+        this.userage = user.getUserage();
+        this.roles = user.getRoles() != null ? new HashSet<>(user.getRoles()) : Collections.emptySet();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getUsername() {
         return username;
@@ -62,11 +87,11 @@ public class UserDTO {
         this.email = email;
     }
 
-    public List<String> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<String> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 }

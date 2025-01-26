@@ -3,70 +3,52 @@ package ru.kata.spring.boot_security.demo.conroller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.DTO.UserDTO;
-import ru.kata.spring.boot_security.demo.entity.Role;
 import ru.kata.spring.boot_security.demo.entity.User;
-import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
-import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
+import ru.kata.spring.boot_security.demo.util.UserConverter;
 
-import javax.persistence.EntityNotFoundException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
 public class AdminApiController {
 
     private final UserService userService;
-    private final RoleService roleService;
-    private final RoleRepository roleRepository;
+    private final UserConverter userConverter;
 
-    public AdminApiController(UserService userService, RoleService roleService, RoleRepository roleRepository) {
+    public AdminApiController(UserService userService, UserConverter userConverter) {
         this.userService = userService;
-        this.roleService = roleService;
-        this.roleRepository = roleRepository;
+        this.userConverter = userConverter;
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getUsers() {
-        List<User> users = userService.getAllUsers();
-        return ResponseEntity.ok(users);
+    public ResponseEntity<List<UserDTO>> getUsers() {
+        List<UserDTO> userDTOS = userService.getAllUsers();
+        return ResponseEntity.ok(userDTOS);
     }
 
     @PostMapping("/add")
-    public ResponseEntity<User> addUser(@RequestBody UserDTO userDTO) {
-        Set<Role> roleSet = userDTO.getRoles().stream()
-                .map(roleService::getRoleByName)
-                .collect(Collectors.toSet());
-        User user = new User();
-        user.setUsername(userDTO.getUsername());
-        user.setPassword(userDTO.getPassword());
-        user.setFirstname(userDTO.getFirstname());
-        user.setLastname(userDTO.getLastname());
-        user.setEmail(userDTO.getEmail());
-        user.setUserage(userDTO.getUserage());
-        user.setRoles(roleSet);
-        userService.addUser(user);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<String> addUser(@RequestBody UserDTO userDTO) {
+        userService.addUser(userConverter.convert(userDTO));
+        return ResponseEntity.ok("User added");
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<User> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/edit/{id}")
-    public ResponseEntity<String> editUser(@PathVariable Long id, @RequestBody User user) {
-        userService.updateUser(id, user);
+    public ResponseEntity<String> editUser(@PathVariable Long id, @RequestBody Map<String, Object> update) {
+        userService.updateUser(id, update);
         return ResponseEntity.ok("{\"message\":\"success\"}");
     }
 
     @GetMapping("/edit/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
-        User user = userService.getUserById(id);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
+        UserDTO userDTO = userService.getUserById(id);
+        return ResponseEntity.ok(userDTO);
     }
 }
