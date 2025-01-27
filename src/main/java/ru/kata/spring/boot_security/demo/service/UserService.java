@@ -1,18 +1,14 @@
 package ru.kata.spring.boot_security.demo.service;
 
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import ru.kata.spring.boot_security.demo.DTO.UserDTO;
 import ru.kata.spring.boot_security.demo.entity.Role;
 import ru.kata.spring.boot_security.demo.entity.User;
 import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
-import ru.kata.spring.boot_security.demo.util.UserNotFoundException;
 
-import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,44 +37,20 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(Long id, Map<String, Object> update) {
-        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
-        update.forEach((key, value) -> {
-            switch (key) {
-                case "username":
-                    user.setUsername((String) value);
-                    break;
-                case "firstname":
-                    user.setFirstname((String) value);
-                    break;
-                case "lastname":
-                    user.setLastname((String) value);
-                    break;
-                case "userage":
-                    user.setUserage((Integer) value);
-                    break;
-                case "email":
-                    user.setEmail((String) value);
-                    break;
-                case "roles":
-                    if (value instanceof List) {
-                        @SuppressWarnings("unchecked")
-                        List<Map<String, Object>> rolesData = (List<Map<String, Object>>) value;
-                        Set<Role> roles = rolesData.stream()
-                                .map(roleData -> {
-                                    Number id1 = (Number) roleData.get("id");
-                                    return roleRepository.findById(id1.longValue())
-                                            .orElseThrow(EntityNotFoundException::new);
-                                })
-                                .collect(Collectors.toSet());
-                        user.setRoles(roles);
-                        break;
-                    } else {
-                        throw new IllegalArgumentException("Wrong parameter");
-                    }
-            }
-        });
-        userRepository.save(user);
+    public void updateUser(Long id, UserDTO userDTO) {
+        User oldUser = userRepository.getById(id);
+
+        oldUser.setUsername(userDTO.getUsername());
+        oldUser.setFirstname(userDTO.getFirstname());
+        oldUser.setLastname(userDTO.getLastname());
+        oldUser.setEmail(userDTO.getEmail());
+        oldUser.setUserage(userDTO.getUserage());
+        Set<Role> updateRoles = userDTO.getRoles().stream()
+                        .map(role -> roleRepository.getById(role.getId()))
+                .collect(Collectors.toSet());
+        oldUser.setRoles(updateRoles);
+
+        userRepository.save(oldUser);
     }
 
     @Transactional

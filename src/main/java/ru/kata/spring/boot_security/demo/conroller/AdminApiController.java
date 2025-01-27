@@ -8,7 +8,6 @@ import ru.kata.spring.boot_security.demo.service.UserService;
 import ru.kata.spring.boot_security.demo.util.UserConverter;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -41,8 +40,8 @@ public class AdminApiController {
     }
 
     @PatchMapping("/edit/{id}")
-    public ResponseEntity<String> editUser(@PathVariable Long id, @RequestBody Map<String, Object> update) {
-        userService.updateUser(id, update);
+    public ResponseEntity<String> editUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+        userService.updateUser(id, userDTO);
         return ResponseEntity.ok("{\"message\":\"success\"}");
     }
 
